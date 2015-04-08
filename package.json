@@ -1,0 +1,35 @@
+{
+  "name": "Rocket",
+  "version": "0.1.0",
+  "description": "Responsive email starter kit",
+  "main": "dist/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spacenomads/rocket.git"
+  },
+  "keywords": [
+    "responsive",
+    "email",
+    "starter",
+    "kit"
+  ],
+  "author": "Space Nomads",
+  "license": "CC0",
+  "bugs": {
+    "url": "https://github.com/spacenomads/rocket/issues"
+  },
+  "homepage": "https://github.com/spacenomads/rocket",
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-data": "^1.2.0",
+    "gulp-file-include": "^0.8.0",
+    "gulp-livereload": "^3.5.0",
+    "gulp-notify": "^2.1.0",
+    "gulp-plumber": "^0.6.6",
+    "gulp-template": "^3.0.0",
+    "gulp-util": "^3.0.2"
+  }
+}
