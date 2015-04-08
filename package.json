@@ -24,6 +24,7 @@
   "homepage": "https://github.com/spacenomads/rocket",
   "devDependencies": {
     "gulp": "^3.8.10",
+    "gulp-cheerio": "^0.6.2",
     "gulp-data": "^1.2.0",
     "gulp-file-include": "^0.8.0",
     "gulp-livereload": "^3.5.0",
