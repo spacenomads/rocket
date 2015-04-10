@@ -49,7 +49,8 @@ gulp.task('targets', ['template'], function() {
         $( this ).attr('target','_blank');
       });
     }))
-    .pipe(gulp.dest( distribution_folder + '/' ));
+    .pipe(gulp.dest( distribution_folder + '/' ))
+    .pipe( livereload() );
 });
 
 gulp.task('watch', function(){
