@@ -1,0 +1,40 @@
+{
+	"settings": {
+		"src": "_source/settings.json"
+	},
+	"folders": {
+		"src": "_source",
+		"dest": "dist"
+	},
+	"images": {
+		"src": "_source/assets/img/**/*.{gif,jpg,jpeg,png,svg}",
+		"dest": "dist/assets/img"
+	},
+	"templates": {
+		"src": "_source/templates/*.pug",
+		"dest": "dist"
+	},
+	"html":{
+		"src": [
+			"dist/**/*.html",
+			"!dist/assets"
+		]
+	},
+	"watch": {
+		"images": [
+			"_source/assets/img/**/*.{gif,jpg,jpeg,png,svg}"
+		],
+		"templates": [
+			"_source/templates/**/*.pug",
+			"!_source/templates/partials/*.pug"
+		],
+		"templatePartials": [
+			"_source/templates/partials/*.pug",
+			"_source/templates/layouts/*.pug"
+		],
+		"html": [
+			"dist/**/*.html",
+			"!dist/assets"
+		]
+	}
+}

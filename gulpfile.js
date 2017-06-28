@@ -1,13 +1,15 @@
-var
-		cheerio      = require( 'gulp-cheerio' ),
-		data         = require( 'gulp-data' ),
-		file_include = require( 'gulp-file-include' ),
-		gulp         = require( 'gulp' ),
-		gutil        = require( 'gulp-util' ),
-		livereload   = require( 'gulp-livereload' ),
-		notify       = require( 'gulp-notify' ),
-		plumber      = require( 'gulp-plumber' ),
-		template     = require( 'gulp-template' );
+var browserSync = require('browser-sync');
+var cheerio     = require('gulp-cheerio');
+var config      = require('./config.json');
+var data        = require('gulp-data');
+var del         = require('del');
+var gulp        = require('gulp');
+var notify      = require('gulp-notify');
+var plumber     = require('gulp-plumber');
+var pug         = require('gulp-pug');
+var rename      = require('gulp-rename');
+var runSequence = require('run-sequence');
+var util        = require('gulp-util');
 
 
 
@@ -15,47 +17,103 @@ var development_folder = '_dev',
 		parts_folder = 'parts',
 		distribution_folder = 'dist';
 
+
+
+
+
 var onError = function ( err ) {
-	gutil.beep();
+	util.beep();
 	console.log( err );
 };
 
-gulp.task( 'deploy', function() {
-	console.log( 'let\'s deploy this' );
-	return gulp.src([ development_folder + '/*.html' ])
-		.pipe(file_include({
-			prefix: '@@',
-			basepath: development_folder + '/' +parts_folder + '/'
-	}))
-	.pipe(gulp.dest( distribution_folder + '/'));
-});
 
-gulp.task( 'template', ['deploy'], function() {
-	return gulp.src( distribution_folder +'/*.html' )
+
+
+
+// > Process .PUG files into 'public' folder
+gulp.task( 'templates', function() {
+	return gulp.src( config.templates.src )
+		.pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
 	  .pipe(data(function(file) {
-      var json = './' + development_folder + '/' + parts_folder + '/settings.json';
-      delete require.cache[require.resolve(json)];
-      return require(json);
+      delete require.cache[require.resolve(config.settings.src)];
+      return require(config.settings.src);
     }))
-    .pipe( template() )
-	  .pipe( gulp.dest( distribution_folder + '/' ) );
+    .pipe( pug({}))
+		.pipe(gulp.dest(config.templates.dest))
+		.pipe(notify({message: 'Templates OK', onLast: true}));
 });
 
-gulp.task('targets', ['template'], function() {
-	console.log( 'All your blank targets belong to us' );
-	return gulp.src([ distribution_folder + '/*.html' ])
+
+
+
+
+// > Process partials .Pug files into 'public' folder
+gulp.task( 'templatePartials' , function(cb) {
+	return gulp.src(config.templates.src)
+		.pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+		.pipe(data(function(file) {
+      delete require.cache[require.resolve(config.settings.src)];
+      return require(config.settings.src);
+    }))
+		.pipe(pug({}))
+		.pipe(gulp.dest(config.templates.dest));
+});
+
+
+
+
+
+
+gulp.task('targets', function() {
+	console.log( 'All your blank targets are belong to us' );
+	return gulp.src([ config.html.src ])
     .pipe(cheerio(function ($, file) {
       $('a').each(function () {
         $( this ).attr('target','_blank');
       });
     }))
-    .pipe(gulp.dest( distribution_folder + '/' ))
-    .pipe( livereload() );
+    .pipe(gulp.dest( config.folders.dest ));
 });
 
-gulp.task('watch', function(){
-	livereload.listen();
-	gulp.watch( development_folder + '/**/*.html', [ 'deploy', 'template', 'targets' ] );
+
+
+
+
+// > Create a development server with BrowserSync
+gulp.task('go', ['default'], function () {
+	browserSync.init({
+		server : {
+			baseDir: config.folders.dest
+		},
+		ghostMode: false,
+		online: true
+	});
+	gulp.watch(config.watch.images, ['bs-reload', ['images']]);
+	gulp.watch(config.watch.templates, ['templates']);
+	gulp.watch(config.watch.templatePartials, ['templatePartials']);
+	gulp.watch(config.watch.html, ['bs-reload']);
 });
 
-gulp.task('default', ['watch']);
+
+
+
+// > Generate 'public' folder
+gulp.task('default', ['clean'], function (cb) {
+	runSequence('templates', ['images'], cb);
+});
+
+
+
+
+
+// > Delete Public folder
+gulp.task('clean', del.bind(null, [config.folders.dest]));
+
+
+
+
+
+// > Force a browser page reload
+gulp.task('bs-reload', function () {
+	browserSync.reload();
+});
