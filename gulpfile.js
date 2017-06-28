@@ -13,14 +13,6 @@ var util        = require('gulp-util');
 
 
 
-var development_folder = '_dev',
-		parts_folder = 'parts',
-		distribution_folder = 'dist';
-
-
-
-
-
 var onError = function ( err ) {
 	util.beep();
 	console.log( err );
@@ -30,15 +22,26 @@ var onError = function ( err ) {
 
 
 
+// > Copy Images
+gulp.task('images', function () {
+	return gulp.src(config.images.src)
+		.pipe(gulp.dest(config.images.dest))
+		.pipe(notify({message: '>> ✔︎ Images', onLast: true}));
+});
+
+
+
+
+
 // > Process .PUG files into 'public' folder
 gulp.task( 'templates', function() {
 	return gulp.src( config.templates.src )
 		.pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
-	  .pipe(data(function(file) {
-      delete require.cache[require.resolve(config.settings.src)];
-      return require(config.settings.src);
-    }))
-    .pipe( pug({}))
+		.pipe(data(function(file) {
+			delete require.cache[require.resolve(config.settings.src)];
+			return require(config.settings.src);
+		}))
+		.pipe(pug({pretty: '	'}))
 		.pipe(gulp.dest(config.templates.dest))
 		.pipe(notify({message: 'Templates OK', onLast: true}));
 });
@@ -52,10 +55,10 @@ gulp.task( 'templatePartials' , function(cb) {
 	return gulp.src(config.templates.src)
 		.pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
 		.pipe(data(function(file) {
-      delete require.cache[require.resolve(config.settings.src)];
-      return require(config.settings.src);
-    }))
-		.pipe(pug({}))
+			delete require.cache[require.resolve(config.settings.src)];
+			return require(config.settings.src);
+		}))
+		.pipe(pug({pretty: '	'}))
 		.pipe(gulp.dest(config.templates.dest));
 });
 
@@ -65,14 +68,18 @@ gulp.task( 'templatePartials' , function(cb) {
 
 
 gulp.task('targets', function() {
-	console.log( 'All your blank targets are belong to us' );
-	return gulp.src([ config.html.src ])
-    .pipe(cheerio(function ($, file) {
-      $('a').each(function () {
-        $( this ).attr('target','_blank');
-      });
-    }))
-    .pipe(gulp.dest( config.folders.dest ));
+	return gulp.src(config.html.src)
+		.pipe(cheerio(function ($, file) {
+			$('a').each(function () {
+				$(this).attr('target','_blank');
+			});
+			$('img').each(function(index, el) {
+				var newSRC = config.settings.path.local + $(this).attr('src');
+				$(this).attr('src', newSRC);
+			});
+		}))
+		.pipe(gulp.dest( config.folders.dest ))
+		.pipe(notify({message: 'All your blank targets are belong to us', onLast: true}));
 });
 
 
@@ -99,7 +106,7 @@ gulp.task('go', ['default'], function () {
 
 // > Generate 'public' folder
 gulp.task('default', ['clean'], function (cb) {
-	runSequence('templates', ['images'], cb);
+	runSequence('templates', ['images','targets'], cb);
 });
 
 
@@ -107,13 +114,14 @@ gulp.task('default', ['clean'], function (cb) {
 
 
 // > Delete Public folder
-gulp.task('clean', del.bind(null, [config.folders.dest]));
+gulp.task('clean', del.bind(null, ['dist']));
 
 
 
 
 
 // > Force a browser page reload
-gulp.task('bs-reload', function () {
+gulp.task('bs-reload', function(cb) {
+	runSequence('targets', cb);
 	browserSync.reload();
 });

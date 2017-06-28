@@ -17,7 +17,7 @@
     "kit"
   ],
   "author": "Space Nomads",
-  "license": "CC0",
+  "license": "CC0-1.0",
   "bugs": {
     "url": "https://github.com/spacenomads/rocket/issues"
   },
@@ -32,7 +32,7 @@
     "gulp-pug": "*",
     "gulp-rename": "*",
     "gulp-util": "*",
-    "gulp": "*",
+    "gulp": "^3.9.0",
     "run-sequence": "*"
   }
 }

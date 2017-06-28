@@ -1,6 +1,10 @@
 {
 	"settings": {
-		"src": "_source/settings.json"
+		"src": "./_source/settings.json",
+		"path": {
+			"local":"assets/img/",
+			"dev": "http://url.com/"
+		}
 	},
 	"folders": {
 		"src": "_source",
