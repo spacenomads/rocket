@@ -3,21 +3,21 @@ block settings
 	
 block vars
 	- var lang = 'es'
-	- var template = 'tpl__home'
-	- var page = 'home'
+	- var title = 'My responsive email - project'
+	- var pageBgcolor = "#ffffff"
+	- var pageWidth = 600
 
 
 doctype html
 html( class="no-js", lang=lang)
 	head
 		meta(charset="utf-8")
-		title= core.pageTitle
-		meta(name="description", content="")
+		title= title
 		include ../partials/_head.pug
-	body(class= template, class=page)
-		.page
+	body(style="background:{#pageBgcolor};margin:0;mso-margin-alt:0;")
+		
+		table(cellpadding="0", cellspacing="0", border="0", width="100%", bgcolor= pageBgcolor)
+			tr
+				td(width="100",valign="top", align="center", bgcolor= pageBgcolor)
 
-			main#main.page__main
-				block main
-
-			//- include ../partials/_footer.pug
+					block main
