@@ -25,6 +25,7 @@
   "devDependencies": {
     "browser-sync": "*",
     "del": "*",
+    "gulp": "^3.9.0",
     "gulp-cheerio": "*",
     "gulp-data": "*",
     "gulp-notify": "*",
@@ -32,7 +33,7 @@
     "gulp-pug": "*",
     "gulp-rename": "*",
     "gulp-util": "*",
-    "gulp": "^3.9.0",
+    "gulp-zip": "^4.0.0",
     "run-sequence": "*"
   }
 }

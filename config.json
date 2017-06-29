@@ -1,14 +1,16 @@
 {
 	"settings": {
 		"src": "./_source/settings.json",
+		"zipName": "mail-project",
 		"path": {
 			"local":"assets/img/",
-			"dev": "http://url.com/"
+			"remote": "http://url.com/"
+		},
+		"folders": {
+			"src": "_source",
+			"dest": "dist",
+			"deliverables": "deliverables"
 		}
-	},
-	"folders": {
-		"src": "_source",
-		"dest": "dist"
 	},
 	"images": {
 		"src": "_source/assets/img/**/*.{gif,jpg,jpeg,png,svg}",

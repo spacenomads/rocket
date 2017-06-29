@@ -1,3 +1,4 @@
+// > Components
 var browserSync = require('browser-sync');
 var cheerio     = require('gulp-cheerio');
 var config      = require('./config.json');
@@ -10,9 +11,14 @@ var pug         = require('gulp-pug');
 var rename      = require('gulp-rename');
 var runSequence = require('run-sequence');
 var util        = require('gulp-util');
+var zip         = require('gulp-zip');
 
 
 
+
+
+// > Functions
+// >> On Error
 var onError = function ( err ) {
 	util.beep();
 	console.log( err );
@@ -22,7 +28,31 @@ var onError = function ( err ) {
 
 
 
-// > Copy Images
+// >> Get timestamp
+var getTimestamp = function(){
+	var d = new Date();
+	var yy = d.getFullYear().toString().substr(-2);
+	var mm = (d.getMonth() + 1).toString();
+	var dd = d.getDate().toString();
+
+	if ( mm.length === 1 ) {
+		mm =  '0' + mm;
+	}
+
+	if ( dd.length === 1 ) {
+		dd =  '0' + mmdd
+	}
+
+	var t = yy + mm + dd;
+	return t;
+};
+
+
+
+
+
+// > Tasks
+// >> Copy Images
 gulp.task('images', function () {
 	return gulp.src(config.images.src)
 		.pipe(gulp.dest(config.images.dest))
@@ -33,7 +63,7 @@ gulp.task('images', function () {
 
 
 
-// > Process .PUG files into 'public' folder
+// >> Process .PUG files into 'dist' folder
 gulp.task( 'templates', function() {
 	return gulp.src( config.templates.src )
 		.pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
@@ -50,7 +80,7 @@ gulp.task( 'templates', function() {
 
 
 
-// > Process partials .Pug files into 'public' folder
+// >> Process partials .Pug files into 'dist' folder
 gulp.task( 'templatePartials' , function(cb) {
 	return gulp.src(config.templates.src)
 		.pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
@@ -66,7 +96,7 @@ gulp.task( 'templatePartials' , function(cb) {
 
 
 
-
+// >> Add target attribute to links
 gulp.task('targets', function() {
 	return gulp.src(config.html.src)
 		.pipe(cheerio(function ($, file) {
@@ -78,7 +108,7 @@ gulp.task('targets', function() {
 				$(this).attr('src', newSRC);
 			});
 		}))
-		.pipe(gulp.dest( config.folders.dest ))
+		.pipe(gulp.dest( config.settings.folders.dest ))
 		.pipe(notify({message: 'All your blank targets are belong to us', onLast: true}));
 });
 
@@ -86,11 +116,11 @@ gulp.task('targets', function() {
 
 
 
-// > Create a development server with BrowserSync
+// >> Create a development server with BrowserSync
 gulp.task('go', ['default'], function () {
 	browserSync.init({
 		server : {
-			baseDir: config.folders.dest
+			baseDir: config.settings.folders.dest
 		},
 		ghostMode: false,
 		online: true
@@ -104,7 +134,7 @@ gulp.task('go', ['default'], function () {
 
 
 
-// > Generate 'public' folder
+// >> Generate 'public' folder
 gulp.task('default', ['clean'], function (cb) {
 	runSequence('templates', ['images','targets'], cb);
 });
@@ -113,15 +143,26 @@ gulp.task('default', ['clean'], function (cb) {
 
 
 
-// > Delete Public folder
+// >> Delete Public folder
 gulp.task('clean', del.bind(null, ['dist']));
 
 
 
 
 
-// > Force a browser page reload
+// >> Force a browser page reload
 gulp.task('bs-reload', function(cb) {
 	runSequence('targets', cb);
 	browserSync.reload();
+});
+
+
+
+
+// >> Compress dist folder into a ZIP file
+gulp.task('zip', function() {
+	var zipName = getTimestamp() + '-' + config.settings.zipName + '.zip';
+	return gulp.src(config.settings.folders.dest + '/**/*.*')
+		.pipe(zip(zipName))
+		.pipe(gulp.dest(config.settings.folders.deliverables));
 });
